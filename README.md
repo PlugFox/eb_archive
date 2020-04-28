@@ -29,8 +29,8 @@ class D with Publisher {}
 void main() {
   // Supervisor for whole app and logs
   MessageBusSupervisor.addMessageCallbacks(<MessageCallback>[
-    (Message e) => print('Supervisor gotcha $e #2'),
     (Message e) => print('Supervisor gotcha $e #1'),
+    (Message e) => print('Supervisor gotcha $e #2'),
   ]);
 
   // Domains/Subsystems/Widgets
