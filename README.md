@@ -26,18 +26,19 @@ class C with Publisher {}
 
 void main() {
   // Supervisor for whole app and logs
-  EventBusSupervisor.addEventCallback((Event e) => print('Supervisor gotcha $e #1'));
-  EventBusSupervisor.addEventCallback((Event e) => print('Supervisor gotcha $e #2'));
+  EventBusSupervisor.addEventCallbacks(<EventCallback>[
+    (Event e) => print('Supervisor gotcha $e #2'),
+    (Event e) => print('Supervisor gotcha $e #1'),
+  ]);
 
   // Domains/Subsystems/Widgets
-  final A a = A();
-  final B b = B()..onEvent((Event e) => print('B gotcha $e'));
-  final C c = C()..emit(const Event());
+  A();
+  B()..onEvent((Event e) => print('B gotcha $e'));
+  C()..emit(const Event());
 
   // Permanent bus destruction
   EventBusSupervisor.kill();
-}
-  
+}  
 ```  
   
   
