@@ -3,26 +3,34 @@ import 'dart:async';
 import 'transition.dart';
 
 ///
-class WhereTypeTransformer<E, EType> implements StreamTransformer<E, E> {
+class WhereEventTypeTransformer<EType extends Event> implements StreamTransformer<Event, Event> {
   final bool _cancelOnError;
+  final String _topic;
 
   ///
-  WhereTypeTransformer({bool cancelOnError = false})
-      : _cancelOnError = cancelOnError ?? false;
+  WhereEventTypeTransformer({String topic = '*', bool cancelOnError = false})
+      : _topic = (topic?.isEmpty ?? true) ? '*' : topic
+      , _cancelOnError = cancelOnError ?? false;
+
+  ///
+  const WhereEventTypeTransformer.all({String topic = '*', bool cancelOnError = false})
+      : _topic = '*'
+      , _cancelOnError = cancelOnError ?? false;
 
   ///
   @override
-  Stream<E> bind(Stream<E> stream) {
-    StreamSubscription<E> subscription;
-    final SynchronousStreamController<E> controller = StreamController<E>(
+  Stream<Event> bind(Stream<Event> stream) {
+    StreamSubscription<Event> subscription;
+    final SynchronousStreamController<Event> controller = StreamController<Event>(
       onCancel: () => subscription.cancel(),
       onPause: () => subscription.pause(),
       onResume: () => subscription.resume(),
       sync: true,
-    ) as SynchronousStreamController<E>;
+    ) as SynchronousStreamController<Event>;
     subscription = stream.listen(
-      (E event) {
+      (Event event) {
         try {
+          if (event.topic != '*' && event.topic != _topic) return;
           if (event is EType) {
             controller.add(event);
           }
@@ -41,26 +49,35 @@ class WhereTypeTransformer<E, EType> implements StreamTransformer<E, E> {
 
   @override
   StreamTransformer<RS, RT> cast<RS, RT>() =>
-      StreamTransformer.castFrom<E, E, RS, RT>(this);
+      StreamTransformer.castFrom<Event, Event, RS, RT>(this);
 }
 
 ///
-class WhereTransitionTransformer<E, PrevEType, NextEType>
-    extends StreamTransformerBase<E, Transition<PrevEType, NextEType>> {
+class WhereEventTransitionTransformer<PrevEType extends Event, NextEType extends Event>
+    extends StreamTransformerBase<Event, Transition<PrevEType, NextEType>> {
   final bool _cancelOnError;
   final bool _onlyCompletely;
+  final String _topic;
 
   ///
-  const WhereTransitionTransformer(
+  WhereEventTransitionTransformer(
+      {String topic, bool onlyCompletely = false, bool cancelOnError = false})
+      : _topic = (topic?.isEmpty ?? true) ? '*' : topic
+      , _cancelOnError = cancelOnError ?? false
+      , _onlyCompletely = onlyCompletely ?? false;
+  
+  ///
+  const WhereEventTransitionTransformer.all(
       {bool onlyCompletely = false, bool cancelOnError = false})
-      : _cancelOnError = cancelOnError ?? false,
-        _onlyCompletely = onlyCompletely ?? false;
+      : _topic = '*'
+      , _cancelOnError = cancelOnError ?? false
+      , _onlyCompletely = onlyCompletely ?? false;
 
   ///
   @override
-  Stream<Transition<PrevEType, NextEType>> bind(Stream<E> stream) {
+  Stream<Transition<PrevEType, NextEType>> bind(Stream<Event> stream) {
     PrevEType prevEvent = null;
-    StreamSubscription<E> subscription;
+    StreamSubscription<Event> subscription;
     final SynchronousStreamController<Transition<PrevEType, NextEType>>
         controller = StreamController<Transition<PrevEType, NextEType>>(
       onCancel: () => subscription.cancel(),
@@ -69,8 +86,9 @@ class WhereTransitionTransformer<E, PrevEType, NextEType>
       sync: true,
     ) as SynchronousStreamController<Transition<PrevEType, NextEType>>;
     subscription = stream.listen(
-      (E event) {
+      (Event event) {
         try {
+          if (event.topic != '*' && event.topic != _topic) return;
           if (event is NextEType && !(_onlyCompletely && prevEvent == null)) {
             controller.add(
                 Transition<PrevEType, NextEType>(prev: prevEvent, next: event));
