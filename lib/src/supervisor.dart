@@ -2,47 +2,47 @@ import 'bus.dart';
 import 'mixins.dart';
 
 /// Служит для глобального управления шиной данных
-class EventBusSupervisor {
-  final List<EventCallback> _eventCallbacks = <EventCallback>[];
-  final List<EventBusExceptionCallback> _exceptionCallbacks =
-      <EventBusExceptionCallback>[];
+class MessageBusSupervisor {
+  final List<MessageCallback> _messageCallbacks = <MessageCallback>[];
+  final List<MessageBusExceptionCallback> _exceptionCallbacks =
+      <MessageBusExceptionCallback>[];
 
   final EventBus _eventBus = EventBus();
 
   /// Добавить событие
-  static void emit(Event event) => _instance._eventBus.emit(event);
+  static void emit(Message msg) => _instance._eventBus.emit(msg);
 
   /// Закрыть шину данных
   /// ВНИМАНИЕ, ЭТО НЕОБРАТИМО
   static Future<void> kill() => _instance._eventBus.kill();
 
   /// Поток событий
-  static Stream<Event> get events => _instance._eventBus.events;
+  static Stream<Message> get messages => _instance._eventBus.messages;
 
   /// Поток ошибок
   static Stream<EventBusException> get errors => _instance._eventBus.errors;
 
   /// Добавить в список коллбэк вызываемый на каждое событие
-  static void addEventCallback(EventCallback eventCallback) =>
-      _instance._eventCallbacks.add(eventCallback);
+  static void addMessageCallback(MessageCallback msgCallback) =>
+      _instance._messageCallbacks.add(msgCallback);
 
   /// Добавить в список коллбэки вызываемый на каждое событие
-  static void addEventCallbacks(List<EventCallback> eventCallbacks) =>
-      _instance._eventCallbacks.addAll(eventCallbacks);
+  static void addMessageCallbacks(List<MessageCallback> msgCallbacks) =>
+      _instance._messageCallbacks.addAll(msgCallbacks);
   
   /// Добавить в список коллбэк вызываемый на каждую ошибку
-  static void addErrorCallback(EventBusExceptionCallback errorCallback) =>
+  static void addErrorCallback(MessageBusExceptionCallback errorCallback) =>
       _instance._exceptionCallbacks.add(errorCallback);
 
-  void _onEvent(Event event) =>
-      _eventCallbacks.forEach((EventCallback callback) => callback(event));
+  void _onMessage(Message msg) =>
+      _messageCallbacks.forEach((MessageCallback callback) => callback(msg));
 
   void _onError(EventBusException error) => _exceptionCallbacks
-      .forEach((EventBusExceptionCallback callback) => callback(error));
+      .forEach((MessageBusExceptionCallback callback) => callback(error));
 
-  static final EventBusSupervisor _instance = EventBusSupervisor._();
-  EventBusSupervisor._() {
-    _eventBus.events.forEach(_onEvent);
+  static final MessageBusSupervisor _instance = MessageBusSupervisor._();
+  MessageBusSupervisor._() {
+    _eventBus.messages.forEach(_onMessage);
     _eventBus.errors.forEach(_onError);
   }
 }

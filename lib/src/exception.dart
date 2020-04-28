@@ -9,9 +9,6 @@ class EventBusException implements Exception {
   /// StackTrace
   final StackTrace stackTrace;
 
-  /// Описание ошибки
-  String get message => toString();
-
   /// Иммутабельно
   const EventBusException({@required this.error, this.stackTrace});
 

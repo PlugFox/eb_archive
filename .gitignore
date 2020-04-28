@@ -21,3 +21,4 @@ coverage*
 
 # Codegen
 *.g.dart
+.vscode/

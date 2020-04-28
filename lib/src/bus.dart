@@ -8,8 +8,8 @@ import 'transition.dart';
 
 ///
 class EventBus {
-  static final StreamController<Event> _controller =
-      StreamController<Event>.broadcast();
+  static final StreamController<Message> _queue =
+      StreamController<Message>.broadcast();
 
   /// Получить объект синглтона шины данных
   factory EventBus() => _instance;
@@ -17,34 +17,31 @@ class EventBus {
   const EventBus._internalSingleton();
 
   /// Поток событий
-  Stream<Event> get events =>
-    _controller.stream.handleError((Object _) => null);
+  Stream<Message> get messages =>
+    _queue.stream.handleError((Object _) => null);
 
   /// Поток ошибок
-  Stream<EventBusException> get errors => _controller.stream.transform<EventBusException>(
-      StreamTransformer<Event, EventBusException>.fromHandlers(
-        handleData: (Event _, EventSink<EventBusException> __) => null,
+  Stream<EventBusException> get errors => _queue.stream.transform<EventBusException>(
+      StreamTransformer<Message, EventBusException>.fromHandlers(
+        handleData: (Message _, EventSink<EventBusException> __) => null,
         handleError: (Object error, StackTrace stackTrace, EventSink<EventBusException> sink) =>
             sink.add(EventBusException(error: error, stackTrace: stackTrace)),        
       ));
 
   /// Добавить событие
-  void emit(Event nextEvent) {
+  void emit(Message nextMsg) {
     try {
-      _controller.add(nextEvent);
+      _queue.add(nextMsg);
     } on dynamic catch (error, stackTrace) {
-      _onError(error, stackTrace);
+      _queue.addError(error, stackTrace);
+      assert(() {
+        throw EventBusException(error: error, stackTrace: stackTrace);
+      }());
     }
   }
 
   /// Закрыть шину данных
   /// ВНИМАНИЕ, ЭТО НЕОБРАТИМО
-  Future<void> kill() => _controller.close();
+  Future<void> kill() => _queue.close();
 
-  void _onError(Object error, StackTrace stackTrace) {
-    _controller.addError(error, stackTrace);
-    assert(() {
-      throw EventBusException(error: error, stackTrace: stackTrace);
-    }());
-  }
 }

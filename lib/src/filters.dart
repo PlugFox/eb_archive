@@ -3,36 +3,36 @@ import 'dart:async';
 import 'transition.dart';
 
 ///
-class WhereEventTypeTransformer<EType extends Event> implements StreamTransformer<Event, Event> {
+class WhereMessageTypeTransformer<MessageType extends Message> implements StreamTransformer<Message, Message> {
   final bool _cancelOnError;
   final String _topic;
 
   ///
-  WhereEventTypeTransformer({String topic = '*', bool cancelOnError = false})
+  WhereMessageTypeTransformer({String topic = '*', bool cancelOnError = false})
       : _topic = (topic?.isEmpty ?? true) ? '*' : topic
       , _cancelOnError = cancelOnError ?? false;
 
   ///
-  const WhereEventTypeTransformer.all({String topic = '*', bool cancelOnError = false})
+  const WhereMessageTypeTransformer.all({bool cancelOnError = false})
       : _topic = '*'
       , _cancelOnError = cancelOnError ?? false;
 
   ///
   @override
-  Stream<Event> bind(Stream<Event> stream) {
-    StreamSubscription<Event> subscription;
-    final SynchronousStreamController<Event> controller = StreamController<Event>(
+  Stream<Message> bind(Stream<Message> stream) {
+    StreamSubscription<Message> subscription;
+    final SynchronousStreamController<Message> controller = StreamController<Message>(
       onCancel: () => subscription.cancel(),
       onPause: () => subscription.pause(),
       onResume: () => subscription.resume(),
       sync: true,
-    ) as SynchronousStreamController<Event>;
+    ) as SynchronousStreamController<Message>;
     subscription = stream.listen(
-      (Event event) {
+      (Message msg) {
         try {
-          if (event.topic != '*' && event.topic != _topic) return;
-          if (event is EType) {
-            controller.add(event);
+          if (_topic != '*' && msg.topic != _topic) return;
+          if (msg is MessageType) {
+            controller.add(msg);
           }
         } on dynamic catch (e, s) {
           controller.addError(e, s);
@@ -49,25 +49,25 @@ class WhereEventTypeTransformer<EType extends Event> implements StreamTransforme
 
   @override
   StreamTransformer<RS, RT> cast<RS, RT>() =>
-      StreamTransformer.castFrom<Event, Event, RS, RT>(this);
+      StreamTransformer.castFrom<Message, Message, RS, RT>(this);
 }
 
 ///
-class WhereEventTransitionTransformer<PrevEType extends Event, NextEType extends Event>
-    extends StreamTransformerBase<Event, Transition<PrevEType, NextEType>> {
+class WhereMessageTransitionTransformer<PrevMessage extends Message, NextMessage extends Message>
+    extends StreamTransformerBase<Message, Transition<PrevMessage, NextMessage>> {
   final bool _cancelOnError;
   final bool _onlyCompletely;
   final String _topic;
 
   ///
-  WhereEventTransitionTransformer(
+  WhereMessageTransitionTransformer(
       {String topic, bool onlyCompletely = false, bool cancelOnError = false})
       : _topic = (topic?.isEmpty ?? true) ? '*' : topic
       , _cancelOnError = cancelOnError ?? false
       , _onlyCompletely = onlyCompletely ?? false;
   
   ///
-  const WhereEventTransitionTransformer.all(
+  const WhereMessageTransitionTransformer.all(
       {bool onlyCompletely = false, bool cancelOnError = false})
       : _topic = '*'
       , _cancelOnError = cancelOnError ?? false
@@ -75,26 +75,26 @@ class WhereEventTransitionTransformer<PrevEType extends Event, NextEType extends
 
   ///
   @override
-  Stream<Transition<PrevEType, NextEType>> bind(Stream<Event> stream) {
-    PrevEType prevEvent = null;
-    StreamSubscription<Event> subscription;
-    final SynchronousStreamController<Transition<PrevEType, NextEType>>
-        controller = StreamController<Transition<PrevEType, NextEType>>(
+  Stream<Transition<PrevMessage, NextMessage>> bind(Stream<Message> stream) {
+    PrevMessage prevMessage = null;
+    StreamSubscription<Message> subscription;
+    final SynchronousStreamController<Transition<PrevMessage, NextMessage>>
+        controller = StreamController<Transition<PrevMessage, NextMessage>>(
       onCancel: () => subscription.cancel(),
       onPause: () => subscription.pause(),
       onResume: () => subscription.resume(),
       sync: true,
-    ) as SynchronousStreamController<Transition<PrevEType, NextEType>>;
+    ) as SynchronousStreamController<Transition<PrevMessage, NextMessage>>;
     subscription = stream.listen(
-      (Event event) {
+      (Message msg) {
         try {
-          if (event.topic != '*' && event.topic != _topic) return;
-          if (event is NextEType && !(_onlyCompletely && prevEvent == null)) {
+          if (msg.topic != '*' && msg.topic != _topic) return;
+          if (msg is NextMessage && !(_onlyCompletely && prevMessage == null)) {
             controller.add(
-                Transition<PrevEType, NextEType>(prev: prevEvent, next: event));
+                Transition<PrevMessage, NextMessage>(prev: prevMessage, next: msg));
           }
-          if (event is PrevEType) {
-            prevEvent = event;
+          if (msg is PrevMessage) {
+            prevMessage = msg;
           }
         } on dynamic catch (e, s) {
           controller.addError(e, s);

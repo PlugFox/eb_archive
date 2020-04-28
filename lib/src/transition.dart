@@ -2,51 +2,51 @@ import 'package:meta/meta.dart';
 
 /// Базовое событие для расширения
 @immutable
-class Event {
+class Message {
   /// Тема
   final String topic;
 
   /// Содержимое
-  final Object message;
+  final Object data;
 
   /// Всегда иммутабельно
-  const Event([String topic = '*', this.message]) : topic = topic ?? '*';
+  const Message([String topic = '*', this.data]) : topic = topic ?? '*';
 
   /// Десериализовать из JSON
-  factory Event.fromJson(Map<String, dynamic> map) =>
-      Event(map['event']['topic'] as String, map['event']['message']);
+  factory Message.fromJson(Map<String, dynamic> map) =>
+      Message(map['message']['topic'] as String, map['message']['data']);
 
   /// Сериализовать в JSON
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'event': <String, dynamic>{
+        'message': <String, dynamic>{
           'topic': topic,
-          'message': message,
+          'data': data,
         },
       };
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Event &&
+      other is Message &&
           runtimeType == other.runtimeType &&
           topic == other.topic &&
-          message == other.message;
+          data == other.data;
 
   @override
   int get hashCode => super.hashCode;
 
   @override
-  String toString() => 'Event { topic: $topic }';
+  String toString() => 'Message { topic: $topic }';
 }
 
 /// Смена событий
 @immutable
-class Transition<PrevEvent, NextEvent> {
+class Transition<PrevMessage, NextMessage> {
   /// Предыдущее состояние
-  final PrevEvent prev;
+  final PrevMessage prev;
 
   /// Следущее событие
-  final NextEvent next;
+  final NextMessage next;
 
   /// Обладает не только следущим событием,
   /// но и предыдущим.

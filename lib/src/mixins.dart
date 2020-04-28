@@ -6,47 +6,47 @@ import 'transition.dart';
 export 'exception.dart';
 export 'transition.dart';
 
-/// Функция принимающая Event и возвращающая void
-typedef EventCallback = void Function(Event);
-/// Функция принимающая EventBusError и возвращающая void
-typedef EventBusExceptionCallback = void Function(EventBusException);
+/// Функция принимающая Message и возвращающая void
+typedef MessageCallback = void Function(Message);
+/// Функция принимающая MessageBusError и возвращающая void
+typedef MessageBusExceptionCallback = void Function(EventBusException);
 
 /// Миксин для отправителя событий в шину данных
 mixin Publisher {
   static final EventBus _eventBus = EventBus();
 
   /// Добавить событие
-  void emit(Event event) => _eventBus.emit(event);
+  void emit(Message msg) => _eventBus.emit(msg);
 }
 
 /// Миксин для приемника событий из шины данных
-mixin Subscriber {
+mixin Subscriber<DefaultMessageType extends Message> {
   static final EventBus _eventBus = EventBus();
 
   /// Поток событий
-  final Stream<Event> events = _eventBus.events;
+  final Stream<Message> messages = _eventBus.messages;
 
   /// Поток фильтрованных событий
   /// Укажите дженерик для фильтрации
-  Stream<Event> whereEvents<EventType extends Event>({String topic = '*'}) =>
-      events.transform(WhereEventTypeTransformer<EventType>(topic: topic));
+  Stream<Message> whereMessages<MessageType extends Message>({String topic = '*'}) =>
+      messages.transform(WhereMessageTypeTransformer<MessageType>(topic: topic));
 
   /// Поток фильтрованных смен событий
   /// onlyCompletely - возвращать только полную смену,
   /// с определенным предыдущим событием
   /// Укажите дженерики для фильтрации
-  Stream<Transition<PrevEvent, NextEvent>>
-      whereTransition<PrevEvent extends Event, NextEvent extends Event>(
+  Stream<Transition<PrevMessage, NextMessage>>
+      whereTransition<PrevMessage extends Message, NextMessage extends Message>(
               {String topic = '*', bool onlyCompletely = false}) =>
-          events.transform(
-              WhereEventTransitionTransformer<PrevEvent, NextEvent>(
+          messages.transform(
+              WhereMessageTransitionTransformer<PrevMessage, NextMessage>(
                   topic: topic,
                   onlyCompletely: onlyCompletely));
 
   /// Коллбэк на событие
   /// Укажите дженерик для фильтрации
-  void onEvent<EventType extends Event>(EventCallback callback, {String topic = '*'}) =>
-      whereEvents<EventType>(topic: topic).forEach(callback);
+  void onMessage<MessageType extends Message>(MessageCallback callback, {String topic = '*'}) =>
+      whereMessages<MessageType>(topic: topic).forEach(callback);
 }
 
 /// Миксин для приемника ошибок из шины данных
@@ -55,6 +55,6 @@ mixin ExceptionSubscriber {
   final Stream<EventBusException> errors = EventBus().errors;
 
   /// Коллбэк на ошибку
-  void onError(EventBusExceptionCallback callback) =>
+  void onError(MessageBusExceptionCallback callback) =>
       errors.forEach(callback);
 }
