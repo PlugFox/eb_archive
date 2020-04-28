@@ -21,7 +21,8 @@ class EventBus {
   void emit(Event nextEvent) => _state.add(nextEvent);
 
   /// Закрыть шину данных
-  Future<void> close() => _state.close();
+  /// ВНИМАНИЕ, ЭТО НЕОБРАТИМО
+  Future<void> kill() => _state.close();
 
   /// TODO: Добавить возможность подписки на темы
 

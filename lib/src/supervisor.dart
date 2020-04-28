@@ -14,7 +14,7 @@ class EventBusSupervisor {
 
   /// Закрыть шину данных
   /// ВНИМАНИЕ, ЭТО НЕОБРАТИМО
-  static Future<void> close() => _instance._eventBus.close();
+  static Future<void> kill() => _instance._eventBus.close();
 
   /// Поток событий
   static Stream<Event> get events => _instance._eventBus.events;
