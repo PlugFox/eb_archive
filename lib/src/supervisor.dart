@@ -14,7 +14,7 @@ class EventBusSupervisor {
 
   /// Закрыть шину данных
   /// ВНИМАНИЕ, ЭТО НЕОБРАТИМО
-  static Future<void> kill() => _instance._eventBus.close();
+  static Future<void> kill() => _instance._eventBus.kill();
 
   /// Поток событий
   static Stream<Event> get events => _instance._eventBus.events;
@@ -26,6 +26,10 @@ class EventBusSupervisor {
   static void addEventCallback(EventCallback eventCallback) =>
       _instance._eventCallbacks.add(eventCallback);
 
+  /// Добавить в список коллбэки вызываемый на каждое событие
+  static void addEventCallbacks(List<EventCallback> eventCallbacks) =>
+      _instance._eventCallbacks.addAll(eventCallbacks);
+  
   /// Добавить в список коллбэк вызываемый на каждую ошибку
   static void addErrorCallback(EventBusExceptionCallback errorCallback) =>
       _instance._exceptionCallbacks.add(errorCallback);
