@@ -1,0 +1,19 @@
+name: eb
+description: >
+  Event-driven architecture pattern 
+version: 0.0.1-dev
+#author: Plague Fox <Plugfox@gmail.com>
+homepage: https://github.com/plugfox/eb
+
+#publish_to: 'none' 
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
+dependencies:
+  meta: '>=1.0.0 <2.0.0'
+
+dev_dependencies:
+  test: any
+
+dependency_overrides:
