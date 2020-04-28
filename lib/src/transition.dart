@@ -35,7 +35,8 @@ class Event {
   @override
   int get hashCode => super.hashCode;
 
-  /// TODO: String toString() =>
+  @override
+  String toString() => 'Event { topic: $topic }';
 }
 
 /// Смена событий
