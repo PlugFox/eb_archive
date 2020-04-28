@@ -16,9 +16,8 @@ class EventBusException implements Exception {
   const EventBusException({@required this.error, this.stackTrace});
 
   @override
-  String toString() =>
-    stackTrace == null 
-    ? 'Unhandled error $error occurred in EventBus.'
-    : 'Unhandled error $error occurred in EventBus.\n'
-      '${stackTrace ?? ''}';
+  String toString() => stackTrace == null
+      ? 'Unhandled error $error occurred in EventBus.'
+      : 'Unhandled error $error occurred in EventBus.\n'
+          '${stackTrace ?? ''}';
 }
