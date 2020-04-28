@@ -20,7 +20,7 @@ mixin Publisher {
 }
 
 /// Миксин для приемника событий из шины данных
-mixin Subscriber<DefaultMessageType extends Message> {
+mixin Subscriber {
   static final EventBus _eventBus = EventBus();
 
   /// Поток событий
