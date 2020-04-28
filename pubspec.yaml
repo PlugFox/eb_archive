@@ -1,6 +1,5 @@
 name: eb
-description: >
-  Event-driven architecture pattern 
+description: Event Manager implementing an event-driven publish–subscribe pattern with singleton Event Bus.
 version: 0.0.1-dev
 #author: Plague Fox <Plugfox@gmail.com>
 homepage: https://github.com/plugfox/eb
