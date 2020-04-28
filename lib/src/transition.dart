@@ -34,6 +34,8 @@ class Event {
 
   @override
   int get hashCode => super.hashCode;
+
+  /// TODO: String toString() =>
 }
 
 /// Смена событий
