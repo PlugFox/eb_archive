@@ -4,7 +4,7 @@ import 'bus.dart';
 import 'mixins.dart';
 
 /// Служит для глобального управления шиной данных
-class MessageBusSupervisor {
+class EventBusSupervisor {
   final Queue<MessageMW> _messageMW = Queue<MessageMW>();
   final Queue<MessageBusExceptionMW> _exceptionMW =
       Queue<MessageBusExceptionMW>();
@@ -58,8 +58,8 @@ class MessageBusSupervisor {
     return mws;
   }
 
-  static final MessageBusSupervisor _instance = MessageBusSupervisor._();
-  MessageBusSupervisor._() {
+  static final EventBusSupervisor _instance = EventBusSupervisor._();
+  EventBusSupervisor._() {
     _eventBus.messages.forEach(_onMessage);
     _eventBus.errors.forEach(_onError);
   }
