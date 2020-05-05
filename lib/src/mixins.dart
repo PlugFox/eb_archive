@@ -28,7 +28,7 @@ mixin Subscriber {
 
   /// Поток фильтрованных событий
   /// Укажите дженерик для фильтрации
-  Stream<MessageType> whereMessages<MessageType extends Message>({String topic = '*'}) =>
+  Stream<MessageType> whereMessages<MessageType extends Message>([String topic = '*']) =>
       messages.transform(WhereMessageTypeTransformer<MessageType>(topic: topic));
 
   /// Поток фильтрованных смен событий
@@ -45,8 +45,8 @@ mixin Subscriber {
 
   /// Коллбэк на событие
   /// Укажите дженерик для фильтрации
-  void onMessage<MessageType extends Message>(MessageMW callback, {String topic = '*'}) =>
-      whereMessages<MessageType>(topic: topic).forEach(callback);
+  void onMessage<MessageType extends Message>(MessageMW callback, [String topic = '*']) =>
+      whereMessages<MessageType>(topic).forEach(callback);
 }
 
 /// Миксин для приемника ошибок из шины данных
