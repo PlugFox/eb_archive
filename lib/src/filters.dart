@@ -3,13 +3,14 @@ import 'dart:async';
 import 'transition.dart';
 
 ///
-class WhereMessageTypeTransformer<MessageType extends Message> implements StreamTransformer<Message, Message> {
+class WhereMessageTypeTransformer<MessageType extends Message> implements StreamTransformer<Message, MessageType> {
   final bool _cancelOnError;
   final String _topic;
 
   ///
   WhereMessageTypeTransformer({String topic = '*', bool cancelOnError = false})
-      : _topic = (topic?.isEmpty ?? true) ? '*' : topic
+      : assert(topic is String && topic.isNotEmpty)
+      , _topic = (topic?.isEmpty ?? true) ? '*' : topic
       , _cancelOnError = cancelOnError ?? false;
 
   ///
@@ -19,14 +20,14 @@ class WhereMessageTypeTransformer<MessageType extends Message> implements Stream
 
   ///
   @override
-  Stream<Message> bind(Stream<Message> stream) {
+  Stream<MessageType> bind(Stream<Message> stream) {
     StreamSubscription<Message> subscription;
-    final SynchronousStreamController<Message> controller = StreamController<Message>(
+    final SynchronousStreamController<MessageType> controller = StreamController<MessageType>(
       onCancel: () => subscription.cancel(),
       onPause: () => subscription.pause(),
       onResume: () => subscription.resume(),
       sync: true,
-    ) as SynchronousStreamController<Message>;
+    ) as SynchronousStreamController<MessageType>;
     subscription = stream.listen(
       (Message msg) {
         try {
@@ -49,7 +50,7 @@ class WhereMessageTypeTransformer<MessageType extends Message> implements Stream
 
   @override
   StreamTransformer<RS, RT> cast<RS, RT>() =>
-      StreamTransformer.castFrom<Message, Message, RS, RT>(this);
+      StreamTransformer.castFrom<Message, MessageType, RS, RT>(this);
 }
 
 ///
@@ -61,8 +62,9 @@ class WhereMessageTransitionTransformer<PrevMessage extends Message, NextMessage
 
   ///
   WhereMessageTransitionTransformer(
-      {String topic, bool onlyCompletely = false, bool cancelOnError = false})
-      : _topic = (topic?.isEmpty ?? true) ? '*' : topic
+      {String topic = '*', bool onlyCompletely = false, bool cancelOnError = false})
+      : assert(topic is String && topic.isNotEmpty)
+      , _topic = (topic?.isEmpty ?? true) ? '*' : topic
       , _cancelOnError = cancelOnError ?? false
       , _onlyCompletely = onlyCompletely ?? false;
   

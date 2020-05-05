@@ -7,9 +7,9 @@ export 'exception.dart';
 export 'transition.dart';
 
 /// Функция принимающая Message и возвращающая void
-typedef MessageCallback = void Function(Message);
+typedef MessageMW = void Function(Message);
 /// Функция принимающая MessageBusError и возвращающая void
-typedef MessageBusExceptionCallback = void Function(EventBusException);
+typedef MessageBusExceptionMW = void Function(EventBusException);
 
 /// Миксин для отправителя событий в шину данных
 mixin Publisher {
@@ -28,7 +28,7 @@ mixin Subscriber {
 
   /// Поток фильтрованных событий
   /// Укажите дженерик для фильтрации
-  Stream<Message> whereMessages<MessageType extends Message>({String topic = '*'}) =>
+  Stream<MessageType> whereMessages<MessageType extends Message>({String topic = '*'}) =>
       messages.transform(WhereMessageTypeTransformer<MessageType>(topic: topic));
 
   /// Поток фильтрованных смен событий
@@ -45,7 +45,7 @@ mixin Subscriber {
 
   /// Коллбэк на событие
   /// Укажите дженерик для фильтрации
-  void onMessage<MessageType extends Message>(MessageCallback callback, {String topic = '*'}) =>
+  void onMessage<MessageType extends Message>(MessageMW callback, {String topic = '*'}) =>
       whereMessages<MessageType>(topic: topic).forEach(callback);
 }
 
@@ -55,6 +55,6 @@ mixin ExceptionSubscriber {
   final Stream<EventBusException> errors = EventBus().errors;
 
   /// Коллбэк на ошибку
-  void onError(MessageBusExceptionCallback callback) =>
+  void onError(MessageBusExceptionMW callback) =>
       errors.forEach(callback);
 }

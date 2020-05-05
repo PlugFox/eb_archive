@@ -1,11 +1,13 @@
+import 'dart:collection';
+
 import 'bus.dart';
 import 'mixins.dart';
 
 /// Служит для глобального управления шиной данных
 class MessageBusSupervisor {
-  final List<MessageCallback> _messageCallbacks = <MessageCallback>[];
-  final List<MessageBusExceptionCallback> _exceptionCallbacks =
-      <MessageBusExceptionCallback>[];
+  final Queue<MessageMW> _messageMW = Queue<MessageMW>();
+  final Queue<MessageBusExceptionMW> _exceptionMW =
+      Queue<MessageBusExceptionMW>();
 
   final EventBus _eventBus = EventBus();
 
@@ -22,23 +24,39 @@ class MessageBusSupervisor {
   /// Поток ошибок
   static Stream<EventBusException> get errors => _instance._eventBus.errors;
 
-  /// Добавить в список коллбэк вызываемый на каждое событие
-  static void addMessageCallback(MessageCallback msgCallback) =>
-      _instance._messageCallbacks.add(msgCallback);
+  /// Добавить в очередь мидлварей метод вызываемый на каждое событие
+  static void addMessageMW(MessageMW msgCallback) =>
+      _instance._messageMW.add(msgCallback);
 
-  /// Добавить в список коллбэки вызываемый на каждое событие
-  static void addMessageCallbacks(List<MessageCallback> msgCallbacks) =>
-      _instance._messageCallbacks.addAll(msgCallbacks);
+  /// Добавить в очередь мидлварей методы вызываемые на каждое событие
+  static void addAllMessageMW(List<MessageMW> msgCallbacks) =>
+      _instance._messageMW.addAll(msgCallbacks);
   
-  /// Добавить в список коллбэк вызываемый на каждую ошибку
-  static void addErrorCallback(MessageBusExceptionCallback errorCallback) =>
-      _instance._exceptionCallbacks.add(errorCallback);
+  /// Добавить в очередь мидлварей метод вызываемый на каждую ошибку
+  static void addErrorMW(MessageBusExceptionMW errorCallback) =>
+      _instance._exceptionMW.add(errorCallback);
 
-  void _onMessage(Message msg) =>
-      _messageCallbacks.forEach((MessageCallback callback) => callback(msg));
+  Future<void> _onMessage(Message msg) {
+    Iterator<MessageMW> iter = _messageMW.iterator;
+    Future<void> mws = Future.doWhile(() {
+      if (!iter.moveNext()) return false;
+      if (iter.current == null) return true;
+      iter.current(msg);
+      return true;
+    });
+    return mws;
+  }
 
-  void _onError(EventBusException error) => _exceptionCallbacks
-      .forEach((MessageBusExceptionCallback callback) => callback(error));
+  Future<void> _onError(EventBusException error) {
+    Iterator<MessageBusExceptionMW> iter = _exceptionMW.iterator;
+    Future<void> mws = Future.doWhile(() {
+      if (!iter.moveNext()) return false;
+      if (iter.current == null) return true;
+      iter.current(error);
+      return true;
+    });
+    return mws;
+  }
 
   static final MessageBusSupervisor _instance = MessageBusSupervisor._();
   MessageBusSupervisor._() {
