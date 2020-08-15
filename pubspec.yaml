@@ -1,18 +1,14 @@
 name: eb
-description: Event Manager implementing an event-driven publish–subscribe pattern with singleton Event Bus.
-version: 0.0.4-dev
-#author: Plague Fox <Plugfox@gmail.com>
+description: Event Bus architecture
+author: Plague Fox <Plugfox@gmail.com>
 homepage: https://github.com/plugfox/eb
-
-#publish_to: 'none' 
+version: 0.0.1-dev
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: '>=2.9.0 <3.0.0'
 
-dependencies:
-  meta: '>=1.0.0 <2.0.0'
+dependencies:  
+  meta: ^1.0.4
 
 dev_dependencies:
-  test: any
-
-dependency_overrides:
+  test: ^1.15.3

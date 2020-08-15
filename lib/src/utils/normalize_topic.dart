@@ -1,0 +1,1 @@
+String normalizeTopic(String topic) => topic?.trim()?.padLeft(1, '*') ?? '*';

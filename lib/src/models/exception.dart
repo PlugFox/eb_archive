@@ -16,5 +16,5 @@ class EventBusException implements Exception {
   String toString() => stackTrace == null
       ? 'Unhandled error $error occurred in EventBus.'
       : 'Unhandled error $error occurred in EventBus.\n'
-          '${stackTrace ?? ''}';
+        '${stackTrace ?? ''}';
 }
