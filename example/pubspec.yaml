@@ -23,15 +23,20 @@ dependencies:
 
   # Utility
   l: ^1.1.1
-  meta: ^1.2.2
+  meta: ^1.0.4
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  #build_runner: ^1.10.2
-  #build_web_compilers: ^2.11.0
-  #build_test: ^1.2.1
-  #test: ^1.15.3
+  # Test
+  build_test: ^1.2.1
+  test: ^1.15.3
+  #flutter_test:
+  #  sdk: flutter
+
+  # Web
+  js: ^0.6.2
+  build_web_compilers: ^2.11.0
+
+  build_runner: ^1.10.2
 
 
 flutter:

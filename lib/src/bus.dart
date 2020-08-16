@@ -14,6 +14,9 @@ import 'transformers/transformers.dart';
 
 /// TODO: шаблон адаптера для интеграции с MQ
 
+/// TODO: в фильтрации сообщений проверять не по точному соответсвию, а по регулярке
+/// например 'logic/login/*'
+
 /// Функция принимающая Message и возвращающая void
 typedef EventBusMW = void Function(Message);
 
